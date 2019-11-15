@@ -43,40 +43,58 @@ int HashTable<KeyType,ValueType>::size() {
 
 template <class KeyType, class ValueType>
 HashTable<KeyType, ValueType>::HashTable(){
-  table = new Table(11);
+  table = new Table();
+  table->reserve(11);
+  table->resize(11);
+  this->num = 0;
 }
 
 template <class KeyType, class ValueType>
 HashTable<KeyType, ValueType>::HashTable(int S){
-  table = new Table(S);
+  table = new Table();
+  table->reserve(S);
+  table->resize(S);
+  this->num = 0;
 }
 
-template <class KeyType>
-int HashTable::hash_function(KeyType k){
-  return k % table->size();
+//hash function
+template <class KeyType, class ValueType>
+int HashTable<KeyType, ValueType>::hash_function(KeyType k){
+  size_t hashVal = hash<KeyType>()(k);
+  int intHash = hashVal % table->size();
+  return intHash;
 }
 
-int HashTable::hash_function(string k){
-  int sum;
-  long p = 1;
-  for (char c : s)
-  {
-    sum = (sum + (c - 'a' + 1) * p ) % table->size();
-    p = p * 31
+
+template <class KeyType, class ValueType>
+void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
+  int index = hash_function(k);
+  while(true){
+    if (table->at(index).isEmpty()==true)
+    {
+      table->at(index).assign(k,v);
+      return;
+    }else{
+      index++;
+      if (index > table->size())
+      {
+        index = hash_function(k);
+        //rehash();
+      }
+    }
   }
 }
 
-template <class KeyType>
-ValueType HashTable::getValue(KeyType k){
-  int index = hash_function(k);
-  return table(index)->getValue;
-}
+// template <class KeyType, class ValueType>
+// ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
+  
+//   int index = hash_function(k);
 
-template <class KeyType, class ValueType>
-void HashTable::insert(KeyType k,ValueType v){
-  int index = hash_function(k);
-  table(index)->assign(k, v);
-}
+//   ValueType val = this->table[index]->getValue();
+//   cout<<this->table[index]->getValue()<<endl;
 
+//   return val;
+
+// }
 
 #endif
