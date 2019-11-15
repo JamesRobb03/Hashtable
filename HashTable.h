@@ -24,7 +24,7 @@ public:
   ValueType getValue(KeyType);    // find and return data associated with key
 
   void insert(KeyType,ValueType); // insert data associated with key into table
-  //void erase(KeyType);            // remove key and associated data from table
+  void erase(KeyType);            // remove key and associated data from table
 
   //void rehash(int); // sets a new size for the hash table, rehashes the hash table 
   // extend if necessary
@@ -99,6 +99,23 @@ ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
     else{
       ValueType val = table->at(index).getValue();
       return val;
+    }
+  } 
+}
+
+template <class KeyType, class ValueType>
+void HashTable<KeyType, ValueType>::erase(KeyType k){
+  //get index of key k.
+  int index = hash_function(k);
+  while(true){
+    KeyType key = table->at(index).getKey();
+    // if key at index is not the the same as k then add 1 to index
+    if (key != k)
+    {
+      index++;
+    }
+    else{
+      delete(table->at(index));
     }
   } 
 }
