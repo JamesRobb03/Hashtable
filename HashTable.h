@@ -65,7 +65,7 @@ int HashTable<KeyType, ValueType>::hash_function(KeyType k){
   return intHash;
 }
 
-
+//INSERT VALUE
 template <class KeyType, class ValueType>
 void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
   int index = hash_function(k);
@@ -85,16 +85,22 @@ void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
   }
 }
 
-// template <class KeyType, class ValueType>
-// ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
+//GET VALUE
+template <class KeyType, class ValueType>
+ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
   
-//   int index = hash_function(k);
-
-//   ValueType val = this->table[index]->getValue();
-//   cout<<this->table[index]->getValue()<<endl;
-
-//   return val;
-
-// }
+  int index = hash_function(k);
+  while(true){
+    KeyType key = table->at(index).getKey();
+    if (key != k)
+    {
+      index++;
+    }
+    else{
+      ValueType val = table->at(index).getValue();
+      return val;
+    }
+  } 
+}
 
 #endif

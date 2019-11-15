@@ -44,7 +44,7 @@ bool test1() {
   T1.insert("World",19);
   T1.insert("abc",12);
   if (T1.getValue("Hello") != 17 || T1.getValue("abc")!=12 || T1.getValue("World") != 19) {
-    cout << "Values are not stored correctly." << endl;
+    cout << "Values are not stored correctly. T1" << endl;
     return false;
   }
 
@@ -52,7 +52,7 @@ bool test1() {
   T2.insert("AAA",42);
   T2.insert("A",76);
   if (T2.getValue("AAAA") != 39 || T2.getValue("A")!=76 || T2.getValue("AAA") != 42) {
-    cout << "Values are not stored correctly." << endl;
+    cout << "Values are not stored correctly. T2" << endl;
     return false;
   } 
 

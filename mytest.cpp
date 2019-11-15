@@ -6,7 +6,7 @@
 using namespace std;
 
 typedef HashNode<string,int> HNSI;
-typedef HashTable<int,int> HTSI;
+typedef HashTable<string,int> HTSI;
 
 int main() {
   
@@ -17,9 +17,11 @@ int main() {
   cout << "Value = " << N.getValue() << endl;
 
   HTSI T1(132);
-  T1.hash_function(60);
-  T1.insert(1,10);
-  //T1.getValue(1);
+  T1.insert("AAAA",4);
+  T1.insert("AAA",3);
+  T1.insert("A",1);
+  int val = T1.getValue("AAAA");
+  cout << "VALUE: "<<val << endl;
 
   return 1;
 }
