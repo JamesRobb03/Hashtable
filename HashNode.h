@@ -1,3 +1,4 @@
+ 
 #ifndef MY_HASH_NODE
 #define MY_HASH_NODE
 
@@ -25,5 +26,16 @@ public:
    Implement the constructor, the assign method 
    and any methods that you may additionally need for the HashTable to work.
 */
+
+template <class KeyType, class ValueType>
+HashNode<KeyType, ValueType>::HashNode(){
+}
+
+template <class KeyType, class ValueType>
+void HashNode<KeyType, ValueType>::assign(KeyType key, ValueType value){
+  this->key = key;
+  this->value = value;
+}
+
 
 #endif
