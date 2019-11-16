@@ -1,11 +1,12 @@
 #include <iostream>
 #include <string>
 
-#include "HashNode.h"
+#include "HashTable.h"
 
 using namespace std;
 
 typedef HashNode<string,int> HNSI;
+typedef HashTable<string,int> HTSI;
 
 int main() {
   
@@ -14,6 +15,13 @@ int main() {
 
   cout << "Key = " << N.getKey() << endl;
   cout << "Value = " << N.getValue() << endl;
+
+  HTSI T1(132);
+  T1.insert("AAAA",4);
+  T1.insert("AAA",3);
+  T1.insert("A",1);
+  int val = T1.getValue("AAAA");
+  cout << "VALUE: "<<val << endl;
 
   return 1;
 }

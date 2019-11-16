@@ -8,6 +8,7 @@ template <class KeyType, class ValueType>
 class HashNode {
   KeyType key;     // The hash node's key
   ValueType value; // The key's associated data
+  bool empty;
 
   /* extend if necessary */
 
@@ -18,6 +19,7 @@ public:
   KeyType getKey() { return key; }
   ValueType getValue() { return value; }
   void assign(KeyType key, ValueType value); 
+  bool isEmpty(){return empty;}
 
   // extend if necessary
 };
@@ -29,12 +31,14 @@ public:
 
 template <class KeyType, class ValueType>
 HashNode<KeyType, ValueType>::HashNode(){
+  empty=true;
 }
 
 template <class KeyType, class ValueType>
 void HashNode<KeyType, ValueType>::assign(KeyType key, ValueType value){
   this->key = key;
   this->value = value;
+  empty = false;
 }
 
 

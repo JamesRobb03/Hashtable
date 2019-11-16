@@ -24,7 +24,7 @@ public:
   ValueType getValue(KeyType);    // find and return data associated with key
 
   void insert(KeyType,ValueType); // insert data associated with key into table
-  //void erase(KeyType);            // remove key and associated data from table
+  void erase(KeyType);            // remove key and associated data from table
 
   //void rehash(int); // sets a new size for the hash table, rehashes the hash table 
   // extend if necessary
@@ -43,40 +43,81 @@ int HashTable<KeyType,ValueType>::size() {
 
 template <class KeyType, class ValueType>
 HashTable<KeyType, ValueType>::HashTable(){
-  table = new Table(11);
+  table = new Table();
+  table->reserve(11);
+  table->resize(11);
+  this->num = 0;
 }
 
 template <class KeyType, class ValueType>
 HashTable<KeyType, ValueType>::HashTable(int S){
-  table = new Table(S);
+  table = new Table();
+  table->reserve(S);
+  table->resize(S);
+  this->num = 0;
 }
 
-template <class KeyType>
-int HashTable::hash_function(KeyType k){
-  return k % table->size();
+//hash function
+template <class KeyType, class ValueType>
+int HashTable<KeyType, ValueType>::hash_function(KeyType k){
+  size_t hashVal = hash<KeyType>()(k);
+  int intHash = hashVal % table->size();
+  return intHash;
 }
 
-int HashTable::hash_function(string k){
-  int sum;
-  long p = 1;
-  for (char c : s)
-  {
-    sum = (sum + (c - 'a' + 1) * p ) % table->size();
-    p = p * 31
+//INSERT VALUE
+template <class KeyType, class ValueType>
+void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
+  int index = hash_function(k);
+  while(true){
+    if (table->at(index).isEmpty()==true)
+    {
+      table->at(index).assign(k,v);
+      return;
+    }else{
+      index++;
+      if (index > table->size())
+      {
+        index = hash_function(k);
+        //rehash();
+      }
+    }
   }
 }
 
-template <class KeyType>
-ValueType HashTable::getValue(KeyType k){
+//GET VALUE
+template <class KeyType, class ValueType>
+ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
+  
   int index = hash_function(k);
-  return table(index)->getValue;
+  while(true){
+    KeyType key = table->at(index).getKey();
+    if (key != k)
+    {
+      index++;
+    }
+    else{
+      ValueType val = table->at(index).getValue();
+      return val;
+    }
+  } 
 }
 
 template <class KeyType, class ValueType>
-void HashTable::insert(KeyType k,ValueType v){
+void HashTable<KeyType, ValueType>::erase(KeyType k){
+  //get index of key k.
   int index = hash_function(k);
-  table(index)->assign(k, v);
+  while(true){
+    KeyType key = table->at(index).getKey();
+    // if key at index is not the the same as k then add 1 to index
+    if (key != k)
+    {
+      index++;
+    }
+    else{
+      delete(table->at(index));
+    }
+  } 
 }
-
 
 #endif
