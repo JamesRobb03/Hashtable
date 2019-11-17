@@ -26,7 +26,7 @@ public:
   void insert(KeyType,ValueType); // insert data associated with key into table
   void erase(KeyType);            // remove key and associated data from table
 
-  //void rehash(int); // sets a new size for the hash table, rehashes the hash table 
+  void rehash(int); // sets a new size for the hash table, rehashes the hash table 
   // extend if necessary
 };
 
@@ -66,9 +66,11 @@ int HashTable<KeyType, ValueType>::hash_function(KeyType k){
 }
 
 //INSERT VALUE
+//add check for duplicate key.
 template <class KeyType, class ValueType>
 void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
   int index = hash_function(k);
+  int counter = 0;
   while(true){
     if (table->at(index).isEmpty()==true)
     {
@@ -76,16 +78,22 @@ void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
       return;
     }else{
       index++;
+      counter++;
       if (index > table->size())
       {
         index = hash_function(k);
         //rehash();
+      }
+      if (counter > (table->size())/2)
+      {
+        //rehash(table->size() * 2)
       }
     }
   }
 }
 
 //GET VALUE
+//add counter so that can return not found if counter > table size
 template <class KeyType, class ValueType>
 ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
   
@@ -96,28 +104,82 @@ ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
     {
       index++;
     }
-    else{
+    else if (key == k && table->at(index).isEmpty()==true)
+    {
+      index++;
+    }
+    else
+    {
       ValueType val = table->at(index).getValue();
       return val;
     }
   } 
 }
 
+//ERASE FUNCTION.
+//add counter so that return not found if key cannot be found.
 template <class KeyType, class ValueType>
 void HashTable<KeyType, ValueType>::erase(KeyType k){
   //get index of key k.
   int index = hash_function(k);
+  int counter = 0;
   while(true){
     KeyType key = table->at(index).getKey();
+
+    //checks to see if every item in the table has been checked.
+    if (counter > table->size())
+    {
+      cout<<"KEY NOT FOUND"<<endl;
+      return;
+    }
+
+    if (index > table->size())
+    {
+      index = hash_function(k);
+    }
+
     // if key at index is not the the same as k then add 1 to index
     if (key != k)
     {
       index++;
+      counter++;
     }
-    else{
-      delete(table->at(index));
+    else if (key == k && table->at(index).isEmpty() == true)
+    {
+      index++;
+      counter++;
+    }
+    else
+    {
+      //set the table to empty so that it can be inserted into
+      table->at(index).setEmpty();
+      return;
     }
   } 
 }
 
+
+template<class KeyType, class ValueType>
+void HashTable<KeyType, ValueType>::rehash(int newSize){
+  if (newSize < table->size())
+   {
+    cout<<"ERROR: new table size should be bigger than orginal hashtable"<<endl;
+   }else{
+    //create a temp table. copy all the values into the temp table.
+    //erase all values in old table.
+    //resize old table.
+    //rehash all values in temp table into new size table.
+    //delete the temp table.
+   } 
+ }
+
 #endif
+
+//TODO
+/**
+Rehash function
+add functionality to insert that if it searches for a free space more than half the size of the hashtable then it rehashes the table.
+deconstructor
+try and catch stsatements
+make use of num in hashtable
+**/

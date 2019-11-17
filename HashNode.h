@@ -20,6 +20,7 @@ public:
   ValueType getValue() { return value; }
   void assign(KeyType key, ValueType value); 
   bool isEmpty(){return empty;}
+  void setEmpty(){empty = true;}
 
   // extend if necessary
 };

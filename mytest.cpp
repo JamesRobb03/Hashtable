@@ -23,5 +23,12 @@ int main() {
   int val = T1.getValue("AAAA");
   cout << "VALUE: "<<val << endl;
 
+  T1.erase("AAA");
+
+
+  if (T1.getValue("AAAA") != 4 || T1.getValue("A")!=1) {
+    cout << "Values are not stored correctly." << endl;
+  }
+
   return 1;
 }
