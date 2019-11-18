@@ -17,7 +17,7 @@ class HashTable {
 public:
   HashTable();        // constructor, initializes table of size 11;
   HashTable(int);  // constructor, requires size of table as arg
-  //~HashTable();       // deconstructor
+  ~HashTable();       // deconstructor
 
   int size();      // returns size of the hash table (number of buckets)
   int hash_function(KeyType);  // the table's hash function
@@ -57,10 +57,21 @@ HashTable<KeyType, ValueType>::HashTable(int S){
   this->num = 0;
 }
 
+template <class KeyType, class ValueType>
+HashTable<KeyType, ValueType>::~HashTable(){
+  delete table;
+}
+
 //hash function
 template <class KeyType, class ValueType>
 int HashTable<KeyType, ValueType>::hash_function(KeyType k){
-  size_t hashVal = hash<KeyType>()(k);
+  //picking random prime number from a vector of ints.
+  vector<int> primes = {37, 53, 61, 79, 97, 139};
+  int primeIndex = rand()%6;
+  int prime = primes.at(primeIndex);
+
+  size_t hashVal = hash<KeyType>()(k);  
+  hashVal = hashVal*prime;
   int intHash = hashVal % table->size();
   return intHash;
 }
@@ -71,25 +82,33 @@ template <class KeyType, class ValueType>
 void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
   int index = hash_function(k);
   int counter = 0;
+  int tableSize = table->size() - 1;
+  int rehashSize = table->size()/2;
   while(true){
     if (table->at(index).isEmpty()==true)
     {
       table->at(index).assign(k,v);
+      num = num+1;
       return;
     }else{
+      KeyType tempKey = table->at(index).getKey();
+      if (tempKey == k && table->at(index).isEmpty() == false)
+      {
+        table->at(index).addDuplicate();
+        cout<<"DUPLICATE_KEY"<<endl;
+        return;
+      }
       index++;
       counter++;
-      if (index > (table->size() - 1))
+      if (index > tableSize)
       {
         index = 0;
       }
-      if (counter > (table->size())/2)
+      if (counter > rehashSize)
       {
-        cout << "TABLE SIZE: "<<table->size() << endl;
-        cout << "TABLE SIZE / 2: " << table->size()/2 << endl;
-
         rehash(table->size() * 2);
-        cout << "REHASHED TABLE"<< endl;
+        tableSize = table->size() - 1;
+        rehashSize = table->size()/2;
       }
     }
   }
@@ -100,8 +119,9 @@ void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
 template <class KeyType, class ValueType>
 ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
   int index = hash_function(k);
+  int tableSize = table->size() - 1;
   while(true){
-    if (index > (table->size()-1))
+    if (index > tableSize)
     {
       index = 0; 
     }
@@ -131,16 +151,17 @@ void HashTable<KeyType, ValueType>::erase(KeyType k){
   //get index of key k.
   int index = hash_function(k);
   int counter = 0;
+  int tableSize = table->size() - 1;
   while(true){
 
     //checks to see if every item in the table has been checked.
-    if (counter > table->size())
+    if (counter > tableSize)
     {
       cout<<"KEY NOT FOUND"<<endl;
       return;
     }
 
-    if (index > (table->size() - 1))
+    if (index > tableSize)
     {
       index = 0;
     }
@@ -169,7 +190,8 @@ void HashTable<KeyType, ValueType>::erase(KeyType k){
 
 template<class KeyType, class ValueType>
 void HashTable<KeyType, ValueType>::rehash(int newSize){
-  if (newSize < table->size())
+  int s = table->size();
+  if (newSize < s)
    {
     cout<<"ERROR: new table size should be bigger than orginal hashtable"<<endl;
    }else{
@@ -182,9 +204,9 @@ void HashTable<KeyType, ValueType>::rehash(int newSize){
     //create tempory table
     Table *temp;
     temp = new Table();
-    int s = table->size();
     temp->reserve(s);
     temp->resize(s);
+    int tableSize = table->size() -1;
 
 
     //makes a copy of the table. called temp
@@ -203,7 +225,7 @@ void HashTable<KeyType, ValueType>::rehash(int newSize){
             inserted = false;
           }else{
             index++;
-            if (index > (table->size() - 1))
+            if (index > tableSize)
             {
               index = 0;
             }
@@ -227,15 +249,6 @@ void HashTable<KeyType, ValueType>::rehash(int newSize){
         insert(keyToInsert,valToInsert);
       }
     }
-
-
-    //testing purp
-    // for (int i = 0; i < table->size(); ++i)
-    // {
-    //   cout << i << " = KEY: " <<table->at(i).getKey() << " IS EMPTY: " << table->at(i).isEmpty() << endl;
-    //   cout << i << " = VAL: " <<table->at(i).getValue() << " IS EMPTY: " << table->at(i).isEmpty() << endl;
-
-    // }
     delete temp;
    } 
  }
