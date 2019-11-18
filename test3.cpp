@@ -82,8 +82,9 @@ bool test1() {
     cout << "String values are not stored correctly." << endl;
     return false;
   } 
-
+  cout<<"test1 passed"<<endl;
   return true;
+
 }
 
 bool test2() {
@@ -156,15 +157,18 @@ bool test2() {
       }
     }
   }
+  cout<<"test2 passed"<<endl;
   return true;
 }
 
 bool test3() {
   HTII T3(17); 
   int num = static_cast<int>(200*T3.size());
+  cout << num << endl;
   for (int i=0; i<num; i++) {
     T3.insert(i,2*i-1);
   }
+  cout<<"Made it this far" << endl; 
   if (T3.size() < static_cast<int>(num)) { cout << "Lost some stored values. - Rehashing is not done correctly." << endl; return false; }
   for (int i=0; i<num; i++) {
     if (T3.getValue(i) != 2*i-1) {

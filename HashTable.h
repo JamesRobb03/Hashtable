@@ -79,14 +79,17 @@ void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
     }else{
       index++;
       counter++;
-      if (index > table->size())
+      if (index > (table->size() - 1))
       {
-        index = hash_function(k);
-        //rehash();
+        index = 0;
       }
       if (counter > (table->size())/2)
       {
-        //rehash(table->size() * 2)
+        cout << "TABLE SIZE: "<<table->size() << endl;
+        cout << "TABLE SIZE / 2: " << table->size()/2 << endl;
+
+        rehash(table->size() * 2);
+        cout << "REHASHED TABLE"<< endl;
       }
     }
   }
@@ -96,9 +99,13 @@ void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
 //add counter so that can return not found if counter > table size
 template <class KeyType, class ValueType>
 ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
-  
   int index = hash_function(k);
   while(true){
+    if (index > (table->size()-1))
+    {
+      index = 0; 
+    }
+    //cout << "INDEX = " << index << " KEY AT INDEX = " << table->at(index).getKey() << " LOOKING FOR = " << k <<  endl; 
     KeyType key = table->at(index).getKey();
     if (key != k)
     {
@@ -113,8 +120,9 @@ ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
       ValueType val = table->at(index).getValue();
       return val;
     }
-  } 
+  }
 }
+
 
 //ERASE FUNCTION.
 //add counter so that return not found if key cannot be found.
@@ -124,7 +132,6 @@ void HashTable<KeyType, ValueType>::erase(KeyType k){
   int index = hash_function(k);
   int counter = 0;
   while(true){
-    KeyType key = table->at(index).getKey();
 
     //checks to see if every item in the table has been checked.
     if (counter > table->size())
@@ -133,11 +140,12 @@ void HashTable<KeyType, ValueType>::erase(KeyType k){
       return;
     }
 
-    if (index > table->size())
+    if (index > (table->size() - 1))
     {
-      index = hash_function(k);
+      index = 0;
     }
 
+    KeyType key = table->at(index).getKey();
     // if key at index is not the the same as k then add 1 to index
     if (key != k)
     {
@@ -170,6 +178,65 @@ void HashTable<KeyType, ValueType>::rehash(int newSize){
     //resize old table.
     //rehash all values in temp table into new size table.
     //delete the temp table.
+
+    //create tempory table
+    Table *temp;
+    temp = new Table();
+    int s = table->size();
+    temp->reserve(s);
+    temp->resize(s);
+
+
+    //makes a copy of the table. called temp
+    for (int i = 0; i < s; ++i)
+    {
+      if (table->at(i).isEmpty() != true)
+      {
+        KeyType tempKey = table->at(i).getKey();
+        ValueType tempVal = table->at(i).getValue();
+        int index = hash_function(tempKey);
+        bool inserted = true;
+        while(inserted){
+          if (temp->at(index).isEmpty()==true)
+          {
+            temp->at(index).assign(tempKey,tempVal);
+            inserted = false;
+          }else{
+            index++;
+            if (index > (table->size() - 1))
+            {
+              index = 0;
+            }
+          }
+        }      
+        //now delete entry from table.
+        table->at(i).setEmpty();
+      }
+    }
+
+    table->reserve(newSize);    
+    table->resize(newSize);
+
+    //copy values from old table into new sized table;
+    for (int i = 0; i < s; ++i)
+    {
+      if (temp->at(i).isEmpty() != true)
+      {
+        KeyType keyToInsert = temp->at(i).getKey();
+        ValueType valToInsert = temp->at(i).getValue();
+        insert(keyToInsert,valToInsert);
+      }
+    }
+
+
+    //testing purp
+    // for (int i = 0; i < table->size(); ++i)
+    // {
+    //   cout << i << " = KEY: " <<table->at(i).getKey() << " IS EMPTY: " << table->at(i).isEmpty() << endl;
+    //   cout << i << " = VAL: " <<table->at(i).getValue() << " IS EMPTY: " << table->at(i).isEmpty() << endl;
+
+    // }
+    delete temp;
    } 
  }
 

@@ -119,21 +119,28 @@ bool test2() {
     cout << "Values are not stored correctly." << endl;
     return false;
   }
+  cout <<"MADE IT THIS FAR"<<endl;
 
   HTII T3(173); 
   int num = static_cast<int>(T3.size());
+  
+  cout << "NUM = " << num << endl;
+
   for (int i=0; i<num; i++) {
     T3.insert(9*i*i+11*i+13,2*i-1);
   }
+  cout <<"MADE IT THIS FAR 2"<<endl;
   for (int i=0; i<num; i++) {
     if (T3.getValue(9*i*i+11*i+13) != 2*i-1) {
       cout << "Integer values are not stored correctly." << endl;
       return false;
     }
   }
+  cout <<"MADE IT THIS FAR 3 "<<endl;
   for (int i=0; i<num; i=i+2) {
     T3.erase(9*i*i+11*i+13);
   }
+
   for (int i=1; i<num; i=i+2) {
     if (T3.getValue(9*i*i+11*i+13) != 2*i-1) {
       cout << "Integer values are not stored correctly after erasing." << endl;
