@@ -3,14 +3,10 @@
 #include <string>
 #include <sstream>
 #include <vector>
-
 #include "HashTable.h"
-
+#include <iomanip>
 using namespace std;
-
 typedef HashTable<string,int> HTSI;
-
-
 //Sorts floats so largest percentages are first in the list. when sorting the floats also move the strings so that they match positions.
 //make it so that if the percentages equal and the strings are the same to set string to "" and float to 0.
 //then when printing only print vectors which are not equal to 0
@@ -30,22 +26,20 @@ void sort(vector<float> *a, vector<string> *b){
                 tempS = b->at(i);
                 b->at(i) = b->at(j);
                 b->at(j) = tempS;
-
-
             }  
         }
     }
-
 }
-
+//function which rounds to two decimal places
 float round(float var) 
 { 
     float value = (int)(var * 100 + .5); 
     return (float)value / 100; 
 } 
-
-bool beenUsed(string s, vector<string> *a){
-    for (int i = 0; i < 9; ++i)
+//returns true if item has already been used
+//used to prevent printing duplicates.
+bool beenUsed(string s, vector<string> *a, int outputNum){
+    for (int i = 0; i < outputNum-1; ++i)
     {
         if (s == a->at(i))
         {
@@ -55,24 +49,25 @@ bool beenUsed(string s, vector<string> *a){
 
     return false;
 }
-
-void finalPrint(vector<float> *a, vector<string> *b, int ngramAmount){
+//function which prints the list
+void finalPrint(vector<float> *a, vector<string> *b, int ngramAmount, int outputNum){
     vector<string> *duplicates;
     duplicates = new vector<string>;
-    duplicates->reserve(10);
-    duplicates->resize(10);
+    duplicates->reserve(outputNum);
+    duplicates->resize(outputNum);
 
     int elements = 0;
     int i = 0;
-    while(elements<10)
+    while(elements<outputNum)
     {
         if (i>ngramAmount-1)
         {
             return;
         }
 
-        if (beenUsed(b->at(i), duplicates) == false)
+        if (beenUsed(b->at(i), duplicates, outputNum) == false)
         {
+            std::cout << std::setprecision(2) << std::fixed;
             cout<<a->at(i)<<":"<<b->at(i)<<endl;
             duplicates->at(elements) = b->at(i);
             elements++;
@@ -82,7 +77,6 @@ void finalPrint(vector<float> *a, vector<string> *b, int ngramAmount){
     }
 }
 
-
 int main(int argc, char const *argv[])
 {
     HTSI hashtable;
@@ -90,18 +84,55 @@ int main(int argc, char const *argv[])
     string s="";
     char letter;
     int numchars = 3;
-
-    if (argc != 2)
+    stringstream stream;
+    stringstream stream2;
+    int outputNum = 10;
+    if (argc == 1)
     {
-        cerr << argv[0] << " requires an argument (filename)" << endl;
-        return 1;
+        file.open("inputfile.txt");
     }
 
-    file.open(argv[1]);
+    else if (argc == 2)
+    {
+        file.open(argv[1]);
+    }
+    else if (argc == 3)
+    {
+        file.open(argv[1]);
+        stream << argv[2];
+        stream >> numchars;
+        if (numchars<1)
+        {
+            cout << "ngram length must be greater than 0"<<endl;
+            return 0;
+        }
+    }
+    else if (argc == 4){
+        file.open(argv[1]);
+        stream << argv[2];
+        stream >> numchars;
+        stream2 << argv[3];
+        stream2 >> outputNum;
+        if (numchars<1)
+        {
+            cout << "ngram length must be greater than 0"<<endl;
+            return 0;
+        }
+        if (outputNum<1)
+        {
+            cout << "number of top most frequent n-grams to output must be greater than 0"<<endl;
+            return 0;
+        }
+    }
+    else{
+        cout<<"To many arguments. please try again"<<endl;
+        return 0;
+    }
+
     if (!file)
     {
-        cerr<<"Could not read file" <<endl;
-        return 1;
+        cerr<<"Could not read file. Check if file exists." <<endl;
+        return 0;
     }
 
     int ngramCount = 0;
@@ -138,7 +169,13 @@ int main(int argc, char const *argv[])
     ngrams->reserve(ngramCount);
     ngrams->resize(ngramCount);
 
-    file.open(argv[1]);
+    if (argc == 1)
+    {
+        file.open("inputfile.txt");
+    }
+    else{
+        file.open(argv[1]);
+    }
     //This is a loop which creates an array of all the ngrams;
     s="";
     int index=0;
@@ -153,7 +190,6 @@ int main(int argc, char const *argv[])
         if (size == numchars)
         {
             ngrams->at(index) = s;
-            //cout<<ngrams->at(index)<<endl;
             index++;
             s = s.substr(1);
 
@@ -167,7 +203,7 @@ int main(int argc, char const *argv[])
     perc->resize(ngramCount);
 
     //loop through list of ngrams. get value assosciated to ngram and then works out the percentage for that ngram.
-    for (int i = 0; i < int(ngramCount-1); ++i)
+    for (int i = 0; i < int(ngramCount); ++i)
     {
         string key = ngrams->at(i);
         int val = hashtable.getValue(key);
@@ -177,60 +213,7 @@ int main(int argc, char const *argv[])
     }
 
     sort(perc, ngrams);
+    finalPrint(perc, ngrams, ngramCount, outputNum);
 
-    // for (int i = 0; i < ngramCount; ++i)
-    // {
-    //     cout<<ngrams->at(i)<<":"<<perc->at(i)<<endl;
-    // }
-
-    finalPrint(perc, ngrams, ngramCount);
     return 0;
 }
-
-
-
-
-
-//need a sort function.
-//need an array of strings.
-
-//Add substring to hashtable as key with value of 0
-//after this check count of key just added. 
-//store count and erase node.
-//add substring back into the hashtable with value of count.
-
-
-//THIS IS CODE 6 FROM WEEK 11
-// int main(int argc, char* argv[]) {
-//     ifstream file;
-//     string s = "";
-//     int numchars = 0;
-//     char letter;
-//     stringstream stream;
-
-//     if (argc != 3){
-//         cerr << argv[0] << " requires two arguments" << endl;
-//         return 1;
-//     }
-
-//     file.open(argv[1]);
-//     if (!file) {
-//         cerr << "Could not read file" << endl; 
-//         return 1; 
-//     }
-
-//     stream << argv[2];
-//     stream >> numchars;
-
-//     while(file.get(letter)) {
-//         if(letter == '\n'){
-//             continue;
-//         }
-//         s += letter;
-//         int size = s.length();
-//         if (size == numchars){
-//             cout << s << endl;
-//             s = s.substr(1);
-//         }
-//     }
-// }
