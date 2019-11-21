@@ -66,5 +66,12 @@ int main() {
   {
     T1.insert(i,"test");
   }
+
+  for (int i = 0; i < s; ++i)
+  {
+    
+      cout << T1.getValue(i) << endl;
+
+  }
   return 1;
 }

@@ -27,6 +27,10 @@ public:
   void erase(KeyType);            // remove key and associated data from table
 
   void rehash(int); // sets a new size for the hash table, rehashes the hash table 
+
+  int getNum(){return num;}
+
+  int getDuplicates(KeyType);
   // extend if necessary
 };
 
@@ -65,13 +69,8 @@ HashTable<KeyType, ValueType>::~HashTable(){
 //hash function
 template <class KeyType, class ValueType>
 int HashTable<KeyType, ValueType>::hash_function(KeyType k){
-  //picking random prime number from a vector of ints.
-  vector<int> primes = {37, 53, 61, 79, 97, 139};
-  int primeIndex = rand()%6;
-  int prime = primes.at(primeIndex);
-
   size_t hashVal = hash<KeyType>()(k);  
-  hashVal = hashVal*prime;
+  hashVal = hashVal*37;
   int intHash = hashVal % table->size();
   return intHash;
 }
@@ -95,7 +94,7 @@ void HashTable<KeyType, ValueType>::insert(KeyType k, ValueType v){
       if (tempKey == k && table->at(index).isEmpty() == false)
       {
         table->at(index).addDuplicate();
-        cout<<"DUPLICATE_KEY"<<endl;
+        //cout<<"DUPLICATE_KEY"<<endl;
         return;
       }
       index++;
@@ -121,6 +120,7 @@ ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
   int index = hash_function(k);
   int tableSize = table->size() - 1;
   while(true){
+
     if (index > tableSize)
     {
       index = 0; 
@@ -143,6 +143,32 @@ ValueType HashTable<KeyType, ValueType>::getValue(KeyType k){
   }
 }
 
+template <class KeyType, class ValueType>
+int HashTable<KeyType, ValueType>::getDuplicates(KeyType k){
+  int index = hash_function(k);
+  int tableSize = table->size() - 1;
+  while(true){
+    if (index > tableSize)
+    {
+      index = 0; 
+    }
+    //cout << "INDEX = " << index << " KEY AT INDEX = " << table->at(index).getKey() << " LOOKING FOR = " << k <<  endl; 
+    KeyType key = table->at(index).getKey();
+    if (key != k)
+    {
+      index++;
+    }
+    else if (key == k && table->at(index).isEmpty()==true)
+    {
+      index++;
+    }
+    else
+    {
+      int duplicates = table->at(index).getDuplicates();
+      return duplicates;
+    }
+  }
+}
 
 //ERASE FUNCTION.
 //add counter so that return not found if key cannot be found.
@@ -182,6 +208,7 @@ void HashTable<KeyType, ValueType>::erase(KeyType k){
     {
       //set the table to empty so that it can be inserted into
       table->at(index).setEmpty();
+      num = num-1;
       return;
     }
   } 
@@ -257,9 +284,5 @@ void HashTable<KeyType, ValueType>::rehash(int newSize){
 
 //TODO
 /**
-Rehash function
-add functionality to insert that if it searches for a free space more than half the size of the hashtable then it rehashes the table.
-deconstructor
-try and catch stsatements
-make use of num in hashtable
+EXCEPTION HANDLING
 **/
